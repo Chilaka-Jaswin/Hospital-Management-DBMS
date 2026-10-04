@@ -44,6 +44,19 @@ DB = {
     "ssl_verify_cert": True,
     "ssl_verify_identity": True
 }
+
+DB = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", ""),
+    "database": os.getenv("DB_NAME", "defaultdb"),
+    "port": int(os.getenv("DB_PORT", "3306")),
+
+    # Aiven SSL
+    "ssl_ca": os.getenv("SSL_CA_PATH", "certs/ca.pem"),
+    "ssl_verify_cert": True,
+    "ssl_verify_identity": True
+}
 # =========================================================
 # DATABASE CONNECTION
 # =========================================================
