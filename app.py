@@ -31,7 +31,8 @@ DB = {
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "hospital_db"),
-    "port": int(os.getenv("DB_PORT", "3306"))
+    "port": int(os.getenv("DB_PORT", "3306")),
+    "ssl_disabled": False
 }
 
 # =========================================================
