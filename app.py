@@ -1038,7 +1038,135 @@ def health():
 
     })
 
+# =========================================================
+# HOSPITAL MODULES
+# =========================================================
 
+MODULE_CONFIG = {
+
+    "rooms": {
+        "title": "Rooms",
+        "query": """
+            SELECT room_id, room_number, room_type,
+                   daily_charge, status
+            FROM Room
+            ORDER BY room_id
+        """
+    },
+
+    "admissions": {
+        "title": "Admissions",
+        "query": """
+            SELECT a.admission_id,
+                   p.patient_name,
+                   a.room_id,
+                   a.admission_date,
+                   a.discharge_date
+            FROM Admission a
+            JOIN Patient p
+            ON p.patient_id = a.patient_id
+            ORDER BY a.admission_id DESC
+        """
+    },
+
+    "treatments": {
+        "title": "Treatments",
+        "query": """
+            SELECT t.treatment_id,
+                   p.patient_name,
+                   d.doctor_name,
+                   t.treatment_description,
+                   t.treatment_date
+            FROM Treatment t
+            JOIN Patient p
+            ON p.patient_id = t.patient_id
+            JOIN Doctor d
+            ON d.doctor_id = t.doctor_id
+            ORDER BY t.treatment_id DESC
+        """
+    },
+
+    "medicines": {
+        "title": "Medicines",
+        "query": """
+            SELECT medicine_id,
+                   medicine_name,
+                   category,
+                   price,
+                   stock_quantity
+            FROM Medicine
+            ORDER BY medicine_id
+        """
+    },
+
+    "billing": {
+        "title": "Billing",
+        "query": """
+            SELECT bill_id,
+                   patient_id,
+                   bill_date,
+                   total_amount,
+                   payment_status
+            FROM Billing
+            ORDER BY bill_id DESC
+        """
+    },
+
+    "users": {
+        "title": "Users",
+        "query": """
+            SELECT user_id,
+                   username,
+                   role
+            FROM Users
+            ORDER BY user_id
+        """
+    }
+}
+
+
+@app.route("/modules/<module_name>")
+@login_required
+def hospital_module(module_name):
+
+    module = MODULE_CONFIG.get(module_name)
+
+    if not module:
+        return "Module not found", 404
+
+    rows = []
+
+    conn = get_db()
+
+    if conn:
+
+        cursor = conn.cursor(dictionary=True)
+
+        try:
+
+            cursor.execute(module["query"])
+
+            rows = cursor.fetchall()
+
+        except Error as e:
+
+            print("Module Error:", e)
+
+            flash(
+                f"Database error: {e}",
+                "danger"
+            )
+
+        finally:
+
+            cursor.close()
+            conn.close()
+
+    return render_template(
+        "module.html",
+        title=module["title"],
+        rows=rows
+    )
 # =========================================================
 # RUN APPLICATION
 # =========================================================

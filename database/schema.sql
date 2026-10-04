@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS hospital_db; USE hospital_db;
+USE defaultdb;
 CREATE TABLE IF NOT EXISTS Department(department_id INT PRIMARY KEY AUTO_INCREMENT,department_name VARCHAR(100) NOT NULL UNIQUE);
 CREATE TABLE IF NOT EXISTS Doctor(doctor_id INT PRIMARY KEY AUTO_INCREMENT,doctor_name VARCHAR(100) NOT NULL,specialization VARCHAR(100),phone VARCHAR(15),department_id INT,FOREIGN KEY(department_id) REFERENCES Department(department_id));
 CREATE TABLE IF NOT EXISTS Patient(patient_id INT PRIMARY KEY AUTO_INCREMENT,patient_name VARCHAR(100) NOT NULL,gender VARCHAR(20),date_of_birth DATE,phone VARCHAR(15),address VARCHAR(200));
