@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}MediCore Hospital Management{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+<div class="shell">
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="side" id="sidebar">
+
+        <!-- BRAND -->
+        <div class="brand">
+
+            <div class="logo">
+                ✚
+            </div>
+
+            <div>
+                <b>MEDICORE</b>
+                <small>Hospital Management</small>
+            </div>
+
+        </div>
+
+
+        <!-- MAIN MENU -->
+
+        <div class="navlabel">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <!-- DASHBOARD -->
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="{% if request.endpoint == 'dashboard' %}active{% endif %}"
+            >
+                <i>⌂</i>
+                <span>Dashboard</span>
+            </a>
+
+
+            <!-- PATIENTS -->
+
+            <a
+                href="{{ url_for('patients') }}"
+                class="{% if request.endpoint == 'patients' or request.endpoint == 'add_patient' %}active{% endif %}"
+            >
+                <i>♙</i>
+                <span>Patients</span>
+            </a>
+
+
+            <!-- DOCTORS -->
+
+            <a
+                href="{{ url_for('doctors') }}"
+                class="{% if request.endpoint == 'doctors' %}active{% endif %}"
+            >
+                <i>♟</i>
+                <span>Doctors</span>
+            </a>
+
+
+            <!-- APPOINTMENTS -->
+
+            <a
+                href="{{ url_for('appointments') }}"
+                class="{% if request.endpoint == 'appointments' %}active{% endif %}"
+            >
+                <i>◷</i>
+                <span>Appointments</span>
+            </a>
+
+        </nav>
+
+
+        <!-- DATABASE -->
+
+        <div class="navlabel">
+            DATABASE
+        </div>
+
+        <nav>
+
+            <!-- DATABASE DESIGN -->
+
+            <a
+                href="{{ url_for('database') }}"
+                class="{% if request.endpoint == 'database' %}active{% endif %}"
+            >
+                <i>▦</i>
+                <span>Database Design</span>
+            </a>
+
+
+            <!-- SQL LABORATORY -->
+
+            <a
+                href="{{ url_for('queries') }}"
+                class="{% if request.endpoint == 'queries' %}active{% endif %}"
+            >
+                <i>⌘</i>
+                <span>SQL Laboratory</span>
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebottom">
+
+            <div class="secure">
+                🔒 Secure workspace
+            </div>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="logout"
+            >
+                ↪ Sign out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="top">
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button
+                class="hamb"
+                id="menuButton"
+                type="button"
+                onclick="toggleSidebar()"
+            >
+                ☰
+            </button>
+
+
+            <!-- PAGE TITLE -->
+
+            <div>
+
+                <span>
+                    HOSPITAL MANAGEMENT SYSTEM
+                </span>
+
+                <h1>
+                    {% block page_title %}
+                    {% endblock %}
+                </h1>
+
+            </div>
+
+
+            <!-- PROFILE -->
+
+            <div class="profile">
+
+                <div class="avatar">
+                    {{ session.get('user', 'A')[:1]|upper }}
+                </div>
+
+                <div>
+
+                    <b>
+                        {{ session.get('user', 'Admin')|title }}
+                    </b>
+
+                    <small>
+                        {{ session.get('role', 'Administrator') }}
+                    </small>
+
+                </div>
+
+                <a href="#">
+                   ⌄
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================================
+             FLASH MESSAGES
+        ========================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =========================================
+             PAGE CONTENT
+        ========================================== -->
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
+<script>
+
+function toggleSidebar() {
+
+    const sidebar = document.getElementById("sidebar");
+
+    if (sidebar) {
+        sidebar.classList.toggle("open");
+    }
+
+}
+
+
+/* Close mobile sidebar when clicking outside */
+
+document.addEventListener("click", function(event) {
+
+    const sidebar = document.getElementById("sidebar");
+    const button = document.getElementById("menuButton");
+
+    if (!sidebar || !button) {
+        return;
+    }
+
+    if (
+        window.innerWidth <= 700 &&
+        sidebar.classList.contains("open") &&
+        !sidebar.contains(event.target) &&
+        !button.contains(event.target)
+    ) {
+
+        sidebar.classList.remove("open");
+
+    }
+
+});
+
+
+/* Close sidebar after clicking a navigation link on mobile */
+
+document.querySelectorAll(".side nav a").forEach(function(link) {
+
+    link.addEventListener("click", function() {
+
+        if (window.innerWidth <= 700) {
+
+            const sidebar = document.getElementById("sidebar");
+
+            if (sidebar) {
+                sidebar.classList.remove("open");
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+
+
+<!-- Extra page JavaScript -->
+
+<script
+    src="{{ url_for('static', filename='js/app.js') }}"
+></script>
+
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>

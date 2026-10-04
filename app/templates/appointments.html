@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}
+Appointments | MediCore
+{% endblock %}
+
+{% block heading %}
+Appointments
+{% endblock %}
+
+{% block content %}
+
+<div class="management-header">
+
+    <h2>Appointment management</h2>
+
+    <p>
+        Schedule and monitor patient–doctor appointments.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     SCHEDULE APPOINTMENT
+===================================================== -->
+
+<div class="panel appointment-panel">
+
+    <div class="panel-head">
+
+        <div>
+            <h3>Schedule appointment</h3>
+
+            <p>
+                Create a new appointment record.
+            </p>
+        </div>
+
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('appointments') }}"
+        class="patient-form"
+    >
+
+        <!-- PATIENT -->
+
+        <div class="form-field">
+
+            <label>
+                Patient
+            </label>
+
+            <select
+                name="patient_id"
+                required
+            >
+
+                <option value="">
+                    Select patient
+                </option>
+
+                {% for patient in patients %}
+
+                <option value="{{ patient.patient_id }}">
+
+                    {{ patient.patient_name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- DOCTOR -->
+
+        <div class="form-field">
+
+            <label>
+                Doctor
+            </label>
+
+            <select
+                name="doctor_id"
+                required
+            >
+
+                <option value="">
+                    Select doctor
+                </option>
+
+                {% for doctor in doctors %}
+
+                <option value="{{ doctor.doctor_id }}">
+
+                    {{ doctor.doctor_name }}
+                    — {{ doctor.specialization }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- DATE -->
+
+        <div class="form-field">
+
+            <label>
+                Appointment date
+            </label>
+
+            <input
+                type="date"
+                name="appointment_date"
+                required
+            >
+
+        </div>
+
+
+        <!-- TIME -->
+
+        <div class="form-field">
+
+            <label>
+                Appointment time
+            </label>
+
+            <input
+                type="time"
+                name="appointment_time"
+                required
+            >
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div class="form-field">
+
+            <label>
+                Status
+            </label>
+
+            <select
+                name="status"
+            >
+
+                <option value="Scheduled">
+                    Scheduled
+                </option>
+
+                <option value="Completed">
+                    Completed
+                </option>
+
+                <option value="Cancelled">
+                    Cancelled
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- BUTTON -->
+
+        <div class="modal-actions">
+
+            <button
+                type="submit"
+                class="primary"
+            >
+                + Schedule appointment
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =====================================================
+     APPOINTMENT RECORDS
+===================================================== -->
+
+<div
+    class="panel appointment-panel"
+    style="margin-top:20px;"
+>
+
+    <div class="panel-head">
+
+        <div>
+
+            <h3>
+                Upcoming & recent
+            </h3>
+
+            <p>
+                Appointment records from the hospital database.
+            </p>
+
+        </div>
+
+        <span class="normal-badge">
+
+            {{ appointments|length }}
+            Records
+
+        </span>
+
+    </div>
+
+
+    {% if appointments %}
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Patient
+                    </th>
+
+                    <th>
+                        Doctor
+                    </th>
+
+                    <th>
+                        Specialization
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for appointment in appointments %}
+
+                <tr>
+
+                    <td>
+
+                        <b>
+                            {{ appointment.patient_name }}
+                        </b>
+
+                    </td>
+
+
+                    <td>
+
+                        {{ appointment.doctor_name }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ appointment.specialization }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ appointment.appointment_date }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ appointment.appointment_time }}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if appointment.status == "Completed" %}
+
+                        <span class="status-badge completed">
+                            Completed
+                        </span>
+
+                        {% elif appointment.status == "Cancelled" %}
+
+                        <span class="status-badge cancelled">
+                            Cancelled
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-badge scheduled">
+                            Scheduled
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            ◷
+        </div>
+
+        <h3>
+            No appointments yet
+        </h3>
+
+        <p>
+            Create your first appointment using the form above.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

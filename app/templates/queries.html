@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}SQL Laboratory | MediCore{% endblock %}
+{% block heading %}SQL Laboratory{% endblock %}
+
+{% block content %}
+
+<section class="sql-page">
+
+    <div class="management-header">
+        <h2>Query Laboratory</h2>
+        <p>Explore and analyze the hospital database using read-only SQL queries.</p>
+    </div>
+
+    <!-- SQL EDITOR -->
+    <div class="panel sql-editor-panel">
+
+        <div class="sql-editor-top">
+
+            <div>
+                <span class="section-label">DATABASE QUERY</span>
+                <h3>SQL Editor</h3>
+                <p>Only SELECT, SHOW and DESCRIBE queries are allowed.</p>
+            </div>
+
+            <div class="readonly-badge">
+                🔒 READ ONLY
+            </div>
+
+        </div>
+
+        <textarea
+            id="sqlQuery"
+            class="sql-editor"
+            spellcheck="false"
+            placeholder="Write your SQL query here..."
+        >SELECT * FROM Patient;</textarea>
+
+        <div class="sql-actions">
+
+            <button
+                class="btn btn-primary"
+                onclick="runSQLQuery()"
+            >
+                ▶ Run Query
+            </button>
+
+            <button
+                class="btn btn-secondary"
+                onclick="clearSQLQuery()"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUICK QUERIES -->
+
+    <div class="sql-section-title">
+        <h3>Quick Queries</h3>
+        <p>Run common database queries with one click.</p>
+    </div>
+
+    <div class="quick-query-grid">
+
+        <button onclick="setSQL('SELECT * FROM Patient;')">
+            <span>👥</span>
+            <strong>All Patients</strong>
+            <small>View patient records</small>
+        </button>
+
+        <button onclick="setSQL('SELECT * FROM Doctor;')">
+            <span>🩺</span>
+            <strong>All Doctors</strong>
+            <small>View doctor records</small>
+        </button>
+
+        <button onclick="setSQL('SELECT * FROM Appointment;')">
+            <span>📅</span>
+            <strong>Appointments</strong>
+            <small>View appointment records</small>
+        </button>
+
+        <button onclick="setSQL('SELECT * FROM Department;')">
+            <span>🏥</span>
+            <strong>Departments</strong>
+            <small>View hospital departments</small>
+        </button>
+
+        <button onclick="setSQL('SELECT COUNT(*) AS total_patients FROM Patient;')">
+            <span>📊</span>
+            <strong>Patient Count</strong>
+            <small>Count registered patients</small>
+        </button>
+
+        <button onclick="setSQL('SELECT COUNT(*) AS total_doctors FROM Doctor;')">
+            <span>👨‍⚕️</span>
+            <strong>Doctor Count</strong>
+            <small>Count hospital doctors</small>
+        </button>
+
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div class="panel sql-result-panel">
+
+        <div class="result-header">
+
+            <div>
+                <span class="section-label">QUERY OUTPUT</span>
+                <h3>Results</h3>
+            </div>
+
+            <span id="queryStatus" class="query-status">
+                Ready
+            </span>
+
+        </div>
+
+        <div id="queryResult" class="query-result">
+
+            <div class="empty-query">
+
+                <div class="empty-query-icon">
+                    ⌘
+                </div>
+
+                <h3>No query executed</h3>
+
+                <p>
+                    Enter a SQL query or choose a quick query above.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SQL EXAMPLES -->
+
+    <div class="sql-section-title">
+        <h3>SQL Examples</h3>
+        <p>Useful queries for your DBMS demonstration.</p>
+    </div>
+
+    <div class="sql-example-grid">
+
+        <div class="sql-example">
+            <span>SELECT</span>
+            <code>SELECT * FROM Patient;</code>
+        </div>
+
+        <div class="sql-example">
+            <span>COUNT</span>
+            <code>SELECT COUNT(*) FROM Doctor;</code>
+        </div>
+
+        <div class="sql-example">
+            <span>FILTER</span>
+            <code>SELECT * FROM Patient WHERE gender='Male';</code>
+        </div>
+
+        <div class="sql-example">
+            <span>JOIN</span>
+            <code>
+                SELECT p.patient_name, d.doctor_name
+                FROM Appointment a
+                JOIN Patient p ON p.patient_id=a.patient_id
+                JOIN Doctor d ON d.doctor_id=a.doctor_id;
+            </code>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

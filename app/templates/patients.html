@@ -1,0 +1,1600 @@
+<!-- =====================================================
+     PREMIUM ADD PATIENT UI
+===================================================== -->
+{% extends "base.html" %}
+
+{% block title %}Patients • MediCore{% endblock %}
+{% block heading %}Patients{% endblock %}
+
+{% block content %}
+
+<section class="patients-page">
+
+    <!-- HEADER -->
+    <div class="management-header">
+        <div>
+            <span class="section-label">PATIENT MANAGEMENT</span>
+            <h2>Patient Records</h2>
+            <p>Manage and maintain hospital patient information.</p>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                onclick="openPatientModal()">
+            + Add Patient
+        </button>
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+    <div class="patient-summary">
+
+        <div class="summary-card">
+            <div class="summary-icon">👥</div>
+            <div>
+                <span>Total Patients</span>
+                <strong>{{ patients|length }}</strong>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">♂</div>
+            <div>
+                <span>Male Patients</span>
+                <strong>
+                    {{ patients|selectattr("gender", "equalto", "Male")|list|length }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">♀</div>
+            <div>
+                <span>Female Patients</span>
+                <strong>
+                    {{ patients|selectattr("gender", "equalto", "Female")|list|length }}
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- PATIENT TABLE -->
+    <div class="panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <span class="section-label">PATIENT DATABASE</span>
+                <h3>Registered Patients</h3>
+            </div>
+
+            <form method="GET"
+                  action="{{ url_for('patients') }}"
+                  class="patient-search">
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="Search patient or phone..."
+                >
+
+                <button type="submit">🔍</button>
+
+            </form>
+
+        </div>
+
+
+        {% if patients %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Gender</th>
+                        <th>Date of Birth</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for patient in patients %}
+
+                    <tr>
+
+                        <td>
+                            <span class="id-badge">
+                                #{{ patient.patient_id }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>{{ patient.patient_name }}</strong>
+                        </td>
+
+                        <td>
+                            {% if patient.gender == "Male" %}
+                                <span class="gender-badge male">Male</span>
+                            {% elif patient.gender == "Female" %}
+                                <span class="gender-badge female">Female</span>
+                            {% else %}
+                                <span class="gender-badge">
+                                    {{ patient.gender or "—" }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ patient.date_of_birth or "—" }}</td>
+
+                        <td>{{ patient.phone or "—" }}</td>
+
+                        <td>{{ patient.address or "—" }}</td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-icon">👥</div>
+
+            <h3>No patients found</h3>
+
+            <p>Add your first patient to the hospital database.</p>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick="openPatientModal()">
+
+                + Add Patient
+
+            </button>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PREMIUM ADD PATIENT MODAL
+===================================================== -->
+
+<div id="patientModal" class="patient-modal">
+
+    <div class="patient-modal-card">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="new-patient-header">
+
+            <div class="patient-title-area">
+
+                <div class="patient-main-icon">
+                    👤
+                </div>
+
+                <div>
+
+                    <span class="section-label">
+                        PATIENT REGISTRATION
+                    </span>
+
+                    <h2>Add New Patient</h2>
+
+                    <p>
+                        Create a new patient record in MediCore.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="new-patient-close"
+                onclick="closePatientModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <!-- PROGRESS -->
+
+        <div class="patient-progress">
+
+            <div class="progress-line"></div>
+
+            <div class="progress-step active">
+                <span>1</span>
+                <small>Patient Details</small>
+            </div>
+
+            <div class="progress-step">
+                <span>2</span>
+                <small>Contact</small>
+            </div>
+
+            <div class="progress-step">
+                <span>3</span>
+                <small>Register</small>
+            </div>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+            method="POST"
+            action="{{ url_for('add_patient') }}"
+            class="new-patient-form"
+        >
+
+
+            <!-- PERSONAL INFORMATION -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+
+                    <div class="form-section-icon">
+                        ✦
+                    </div>
+
+                    <div>
+                        <h3>Personal Information</h3>
+                        <p>Basic details of the patient</p>
+                    </div>
+
+                </div>
+
+
+                <div class="new-form-grid">
+
+
+                    <!-- NAME -->
+
+                    <div class="new-form-group full">
+
+                        <label>
+                            Patient Full Name
+                            <span>*</span>
+                        </label>
+
+                        <div class="input-with-icon">
+
+                            <span>👤</span>
+
+                            <input
+                                type="text"
+                                name="patient_name"
+                                placeholder="Enter patient's full name"
+                                required
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- GENDER -->
+
+                    <div class="new-form-group">
+
+                        <label>
+                            Gender
+                        </label>
+
+                        <div class="gender-options">
+
+                            <label class="gender-option">
+
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="Male"
+                                >
+
+                                <span class="gender-option-content">
+                                    <b>♂</b>
+                                    <span>Male</span>
+                                </span>
+
+                            </label>
+
+
+                            <label class="gender-option">
+
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="Female"
+                                >
+
+                                <span class="gender-option-content">
+                                    <b>♀</b>
+                                    <span>Female</span>
+                                </span>
+
+                            </label>
+
+
+                            <label class="gender-option">
+
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="Other"
+                                >
+
+                                <span class="gender-option-content">
+                                    <b>⚪</b>
+                                    <span>Other</span>
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DOB -->
+
+                    <div class="new-form-group">
+
+                        <label>
+                            Date of Birth
+                        </label>
+
+                        <div class="input-with-icon">
+
+                            <span>📅</span>
+
+                            <input
+                                type="date"
+                                name="date_of_birth"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTACT INFORMATION -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+
+                    <div class="form-section-icon">
+                        ☎
+                    </div>
+
+                    <div>
+                        <h3>Contact Information</h3>
+                        <p>Patient communication details</p>
+                    </div>
+
+                </div>
+
+
+                <div class="new-form-grid">
+
+
+                    <!-- PHONE -->
+
+                    <div class="new-form-group">
+
+                        <label>
+                            Phone Number
+                        </label>
+
+                        <div class="input-with-icon">
+
+                            <span>📱</span>
+
+                            <input
+                                type="tel"
+                                name="phone"
+                                placeholder="Enter phone number"
+                                maxlength="15"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="new-form-group full">
+
+                        <label>
+                            Address
+                        </label>
+
+                        <div class="input-with-icon textarea-icon">
+
+                            <span>📍</span>
+
+                            <textarea
+                                name="address"
+                                rows="3"
+                                placeholder="Enter complete patient address"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM FOOTER -->
+
+            <div class="new-patient-footer">
+
+                <div class="secure-note">
+
+                    <span>🔒</span>
+
+                    <div>
+                        <strong>Hospital Record</strong>
+                        <small>Information will be saved to MediCore database.</small>
+                    </div>
+
+                </div>
+
+
+                <div class="patient-buttons">
+
+                    <button
+                        type="button"
+                        class="cancel-patient-btn"
+                        onclick="closePatientModal()">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="register-patient-btn">
+
+                        <span>✓</span>
+                        Register Patient
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADD PATIENT JAVASCRIPT
+===================================================== -->
+
+<script>
+
+function openPatientModal() {
+
+    const modal = document.getElementById("patientModal");
+
+    if (modal) {
+
+        modal.classList.add("show");
+
+        document.body.style.overflow = "hidden";
+
+        setTimeout(function () {
+
+            const input =
+                document.querySelector(
+                    'input[name="patient_name"]'
+                );
+
+            if (input) {
+                input.focus();
+            }
+
+        }, 250);
+
+    }
+
+}
+
+
+function closePatientModal() {
+
+    const modal =
+        document.getElementById("patientModal");
+
+    if (modal) {
+
+        modal.classList.remove("show");
+
+        document.body.style.overflow = "";
+
+    }
+
+}
+
+
+/* Close when clicking outside */
+
+document.addEventListener("click", function(event) {
+
+    const modal =
+        document.getElementById("patientModal");
+
+    if (
+        modal &&
+        event.target === modal
+    ) {
+
+        closePatientModal();
+
+    }
+
+});
+
+
+/* ESC key */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+
+        closePatientModal();
+
+    }
+
+});
+
+</script>
+
+
+<!-- =====================================================
+     PREMIUM ADD PATIENT UI
+===================================================== -->
+
+<style>
+
+/* =====================================================
+   MODAL BACKGROUND
+===================================================== */
+
+.patient-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 25px;
+
+    background:
+        rgba(3, 8, 18, .78);
+
+    backdrop-filter: blur(12px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+
+}
+
+
+.patient-modal.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+/* =====================================================
+   MODAL CARD
+===================================================== */
+
+.patient-modal-card {
+
+    width: 100%;
+
+    max-width: 850px;
+
+    max-height: 92vh;
+
+    overflow-y: auto;
+
+    border-radius: 24px;
+
+    border:
+        1px solid rgba(76,201,240,.18);
+
+    background:
+
+        radial-gradient(
+            circle at 100% 0%,
+            rgba(76,201,240,.09),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            145deg,
+            #151e30,
+            #0c1423
+        );
+
+    box-shadow:
+        0 35px 90px rgba(0,0,0,.55),
+        0 0 50px rgba(76,201,240,.05);
+
+    transform:
+        translateY(25px) scale(.97);
+
+    transition:
+        transform .3s ease;
+
+}
+
+
+.patient-modal.show .patient-modal-card {
+
+    transform:
+        translateY(0) scale(1);
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.new-patient-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    padding: 27px 30px 22px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.07);
+
+}
+
+
+.patient-title-area {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 17px;
+
+}
+
+
+.patient-main-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 17px;
+
+    font-size: 26px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(76,201,240,.18),
+            rgba(76,201,240,.06)
+        );
+
+    border:
+        1px solid rgba(76,201,240,.22);
+
+    box-shadow:
+        0 8px 25px rgba(76,201,240,.07);
+
+}
+
+
+.new-patient-header h2 {
+
+    margin: 4px 0 5px;
+
+    color: #fff;
+
+    font-size: 23px;
+
+    font-weight: 750;
+
+}
+
+
+.new-patient-header p {
+
+    margin: 0;
+
+    color:
+        rgba(255,255,255,.45);
+
+    font-size: 11px;
+
+}
+
+
+.new-patient-close {
+
+    width: 36px;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 11px;
+
+    color:
+        rgba(255,255,255,.60);
+
+    background:
+        rgba(255,255,255,.05);
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    transition: .2s;
+
+}
+
+
+.new-patient-close:hover {
+
+    color: #fff;
+
+    background:
+        rgba(255,80,100,.14);
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.patient-progress {
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 18px 70px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.05);
+
+}
+
+
+.progress-line {
+
+    position: absolute;
+
+    left: 105px;
+
+    right: 105px;
+
+    top: 31px;
+
+    height: 1px;
+
+    background:
+        rgba(255,255,255,.10);
+
+}
+
+
+.progress-step {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 5px;
+
+}
+
+
+.progress-step span {
+
+    width: 27px;
+
+    height: 27px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color:
+        rgba(255,255,255,.45);
+
+    background: #151e30;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.progress-step.active span {
+
+    color: #07131f;
+
+    background: #4cc9f0;
+
+    border-color: #4cc9f0;
+
+}
+
+
+.progress-step small {
+
+    color:
+        rgba(255,255,255,.35);
+
+    font-size: 8px;
+
+}
+
+
+.progress-step.active small {
+
+    color: #4cc9f0;
+
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.new-patient-form {
+
+    padding: 25px 30px 28px;
+
+}
+
+
+.form-section {
+
+    margin-bottom: 24px;
+
+    padding-bottom: 22px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.06);
+
+}
+
+
+.form-section:last-of-type {
+
+    border-bottom: none;
+
+}
+
+
+.form-section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin-bottom: 17px;
+
+}
+
+
+.form-section-icon {
+
+    width: 34px;
+
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    color: #4cc9f0;
+
+    background:
+        rgba(76,201,240,.08);
+
+    border:
+        1px solid rgba(76,201,240,.13);
+
+}
+
+
+.form-section-title h3 {
+
+    margin: 0;
+
+    color: #fff;
+
+    font-size: 13px;
+
+}
+
+
+.form-section-title p {
+
+    margin: 3px 0 0;
+
+    color:
+        rgba(255,255,255,.35);
+
+    font-size: 9px;
+
+}
+
+
+.new-form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 18px;
+
+}
+
+
+.new-form-group.full {
+
+    grid-column: 1 / -1;
+
+}
+
+
+.new-form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color:
+        rgba(255,255,255,.72);
+
+    font-size: 10px;
+
+    font-weight: 650;
+
+}
+
+
+.new-form-group label span {
+
+    color: #ff7180;
+
+}
+
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.input-with-icon {
+
+    position: relative;
+
+}
+
+
+.input-with-icon > span {
+
+    position: absolute;
+
+    left: 13px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 2;
+
+    font-size: 14px;
+
+    opacity: .7;
+
+}
+
+
+.input-with-icon input,
+.input-with-icon textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    border-radius: 12px;
+
+    outline: none;
+
+    color: #fff;
+
+    background:
+        rgba(255,255,255,.035);
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    transition: .2s;
+
+}
+
+
+.input-with-icon input {
+
+    height: 45px;
+
+    padding:
+        0 13px 0 40px;
+
+}
+
+
+.input-with-icon textarea {
+
+    min-height: 85px;
+
+    padding:
+        13px 13px 13px 40px;
+
+    resize: vertical;
+
+}
+
+
+.input-with-icon input::placeholder,
+.input-with-icon textarea::placeholder {
+
+    color:
+        rgba(255,255,255,.25);
+
+}
+
+
+.input-with-icon input:focus,
+.input-with-icon textarea:focus {
+
+    border-color:
+        rgba(76,201,240,.55);
+
+    background:
+        rgba(76,201,240,.035);
+
+    box-shadow:
+        0 0 0 3px rgba(76,201,240,.07);
+
+}
+
+
+.textarea-icon > span {
+
+    top: 18px;
+
+    transform: none;
+
+}
+
+
+/* =====================================================
+   GENDER OPTIONS
+===================================================== */
+
+.gender-options {
+
+    display: flex;
+
+    gap: 8px;
+
+}
+
+
+.gender-option {
+
+    flex: 1;
+
+    position: relative;
+
+    cursor: pointer;
+
+}
+
+
+.gender-option input {
+
+    position: absolute;
+
+    opacity: 0;
+
+}
+
+
+.gender-option-content {
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius: 12px;
+
+    color:
+        rgba(255,255,255,.48);
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    font-size: 10px;
+
+    transition: .2s;
+
+}
+
+
+.gender-option-content b {
+
+    font-size: 14px;
+
+}
+
+
+.gender-option input:checked
++ .gender-option-content {
+
+    color: #4cc9f0;
+
+    border-color:
+        rgba(76,201,240,.45);
+
+    background:
+        rgba(76,201,240,.09);
+
+    box-shadow:
+        0 0 15px rgba(76,201,240,.05);
+
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.new-patient-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid rgba(255,255,255,.07);
+
+}
+
+
+.secure-note {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+}
+
+
+.secure-note > span {
+
+    font-size: 17px;
+
+}
+
+
+.secure-note strong {
+
+    display: block;
+
+    color:
+        rgba(255,255,255,.70);
+
+    font-size: 9px;
+
+}
+
+
+.secure-note small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color:
+        rgba(255,255,255,.30);
+
+    font-size: 8px;
+
+}
+
+
+.patient-buttons {
+
+    display: flex;
+
+    gap: 9px;
+
+}
+
+
+.cancel-patient-btn,
+.register-patient-btn {
+
+    height: 42px;
+
+    padding:
+        0 18px;
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    transition: .2s;
+
+}
+
+
+.cancel-patient-btn {
+
+    color:
+        rgba(255,255,255,.58);
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+}
+
+
+.cancel-patient-btn:hover {
+
+    color: #fff;
+
+    background:
+        rgba(255,255,255,.08);
+
+}
+
+
+.register-patient-btn {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #06121b;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4cc9f0,
+            #55d6ff
+        );
+
+    border: none;
+
+    box-shadow:
+        0 7px 20px rgba(76,201,240,.16);
+
+}
+
+
+.register-patient-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 27px rgba(76,201,240,.25);
+
+}
+
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+.patient-modal-card::-webkit-scrollbar {
+
+    width: 5px;
+
+}
+
+
+.patient-modal-card::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+.patient-modal-card::-webkit-scrollbar-thumb {
+
+    border-radius: 10px;
+
+    background:
+        rgba(76,201,240,.25);
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .patient-modal {
+
+        padding: 10px;
+
+        align-items: flex-start;
+
+    }
+
+
+    .patient-modal-card {
+
+        max-height: 96vh;
+
+        margin-top: 10px;
+
+        border-radius: 18px;
+
+    }
+
+
+    .new-patient-header {
+
+        padding: 20px;
+
+    }
+
+
+    .patient-title-area {
+
+        gap: 11px;
+
+    }
+
+
+    .patient-main-icon {
+
+        width: 45px;
+
+        height: 45px;
+
+        font-size: 20px;
+
+    }
+
+
+    .new-patient-header h2 {
+
+        font-size: 18px;
+
+    }
+
+
+    .patient-progress {
+
+        padding:
+            15px 30px;
+
+    }
+
+
+    .progress-line {
+
+        left: 55px;
+
+        right: 55px;
+
+        top: 28px;
+
+    }
+
+
+    .new-patient-form {
+
+        padding:
+            20px;
+
+    }
+
+
+    .new-form-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .new-form-group.full {
+
+        grid-column: auto;
+
+    }
+
+
+    .gender-options {
+
+        flex-direction: column;
+
+    }
+
+
+    .new-patient-footer {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .patient-buttons {
+
+        width: 100%;
+
+    }
+
+
+    .cancel-patient-btn,
+    .register-patient-btn {
+
+        flex: 1;
+
+        justify-content: center;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

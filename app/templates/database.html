@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}Database Design | MediCore{% endblock %}
+
+{% block page_title %}
+Database Design
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================
+     DATABASE HEADER
+========================================= -->
+
+<div class="management-header">
+
+    <h2>Hospital Database Architecture</h2>
+
+    <p>
+        Explore the entities, relationships and normalization
+        used in the MediCore Hospital Management System.
+    </p>
+
+</div>
+
+
+<!-- =========================================
+     DATABASE OVERVIEW
+========================================= -->
+
+<div class="stats">
+
+    <div class="stat">
+
+        <div class="sicon blue">
+            ▦
+        </div>
+
+        <div>
+
+            <small>TOTAL TABLES</small>
+
+            <strong>{{ tables|length }}</strong>
+
+            <span>Database entities</span>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="sicon green">
+            🔑
+        </div>
+
+        <div>
+
+            <small>PRIMARY KEYS</small>
+
+            <strong>10</strong>
+
+            <span>Unique identifiers</span>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="sicon purple">
+            🔗
+        </div>
+
+        <div>
+
+            <small>RELATIONSHIPS</small>
+
+            <strong>8+</strong>
+
+            <span>Foreign-key links</span>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="sicon orange">
+            3NF
+        </div>
+
+        <div>
+
+            <small>NORMALIZATION</small>
+
+            <strong>3NF</strong>
+
+            <span>Normalized database</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     DATABASE TABLES
+========================================= -->
+
+<div class="database-card">
+
+    <h3>Database Tables</h3>
+
+    <p style="color:#718096;margin-bottom:18px;">
+        Core entities stored in the hospital management database.
+    </p>
+
+
+    <div class="database-list">
+
+        {% for table in tables %}
+
+        <div class="database-item">
+
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+            ">
+
+                <span style="
+                    width:34px;
+                    height:34px;
+                    display:grid;
+                    place-items:center;
+                    border-radius:9px;
+                    background:#eaf1ff;
+                    color:#2d6cdf;
+                ">
+                    ▦
+                </span>
+
+                <div>
+
+                    <strong>{{ table }}</strong>
+
+                    <small style="
+                        display:block;
+                        color:#8994a7;
+                        font-size:10px;
+                        margin-top:3px;
+                    ">
+                        Relational table
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     RELATIONSHIPS
+========================================= -->
+
+<div class="relationship-card">
+
+    <h3>Entity Relationships</h3>
+
+    <p style="color:#718096;margin-bottom:18px;">
+        Primary-key and foreign-key relationships between hospital entities.
+    </p>
+
+
+    <div class="quick">
+
+        <div class="quick a" style="cursor:default;">
+
+            <span>👨‍⚕️</span>
+
+            <b>Department → Doctor</b>
+
+            <small>
+                A department can have multiple doctors.
+            </small>
+
+            <em>1 : N</em>
+
+        </div>
+
+
+        <div class="quick a" style="cursor:default;">
+
+            <span>👤</span>
+
+            <b>Patient → Appointment</b>
+
+            <small>
+                A patient can have multiple appointments.
+            </small>
+
+            <em>1 : N</em>
+
+        </div>
+
+
+        <div class="quick a" style="cursor:default;">
+
+            <span>⚕</span>
+
+            <b>Doctor → Appointment</b>
+
+            <small>
+                A doctor can manage multiple appointments.
+            </small>
+
+            <em>1 : N</em>
+
+        </div>
+
+
+        <div class="quick a" style="cursor:default;">
+
+            <span>🏥</span>
+
+            <b>Patient → Admission</b>
+
+            <small>
+                Patient admission records are linked to patients.
+            </small>
+
+            <em>1 : N</em>
+
+        </div>
+
+    </div>
+
+
+    <ul>
+
+        <li>
+            <b>Department → Doctor</b>
+            — department_id
+        </li>
+
+        <li>
+            <b>Patient → Appointment</b>
+            — patient_id
+        </li>
+
+        <li>
+            <b>Doctor → Appointment</b>
+            — doctor_id
+        </li>
+
+        <li>
+            <b>Patient → Admission</b>
+            — patient_id
+        </li>
+
+        <li>
+            <b>Room → Admission</b>
+            — room_id
+        </li>
+
+        <li>
+            <b>Patient → Treatment</b>
+            — patient_id
+        </li>
+
+        <li>
+            <b>Doctor → Treatment</b>
+            — doctor_id
+        </li>
+
+        <li>
+            <b>Patient → Billing</b>
+            — patient_id
+        </li>
+
+    </ul>
+
+</div>
+
+
+<!-- =========================================
+     NORMALIZATION
+========================================= -->
+
+<div class="normalization-card">
+
+    <h3>Database Normalization</h3>
+
+    <p style="color:#718096;margin-bottom:18px;">
+        The database follows normalization principles to reduce
+        redundancy and maintain data consistency.
+    </p>
+
+
+    <div class="normalization-row">
+
+        <b>1NF</b>
+
+        <span>
+            Each field contains atomic values and each record
+            is uniquely identifiable.
+        </span>
+
+    </div>
+
+
+    <div class="normalization-row">
+
+        <b>2NF</b>
+
+        <span>
+            Non-key attributes depend on the complete primary key.
+        </span>
+
+    </div>
+
+
+    <div class="normalization-row">
+
+        <b>3NF</b>
+
+        <span>
+            Non-key attributes depend only on the primary key,
+            reducing unnecessary data duplication.
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     ARCHITECTURE
+========================================= -->
+
+<div class="database-card">
+
+    <div class="pt">
+
+        <h3>System Architecture</h3>
+
+        <span style="
+            background:#e7f8f1;
+            color:#13a36f;
+            padding:5px 9px;
+            border-radius:15px;
+            font-size:10px;
+            font-weight:800;
+        ">
+            3NF
+        </span>
+
+    </div>
+
+
+    <div class="architecture">
+
+        <div>
+            USER INTERFACE
+        </div>
+
+        <b>→</b>
+
+        <div>
+            FLASK APPLICATION
+        </div>
+
+        <b>→</b>
+
+        <div>
+            MYSQL DATABASE
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     PROJECT DATABASE
+========================================= -->
+
+<div class="panel about">
+
+    <h3>About the Database</h3>
+
+    <p>
+        MediCore Hospital Management Database
+    </p>
+
+    <small>
+        The system uses a relational MySQL database to manage
+        patients, doctors, appointments, departments, rooms,
+        admissions, treatments, medicines, billing and users.
+        Foreign keys connect related entities and help maintain
+        referential integrity.
+    </small>
+
+</div>
+
+{% endblock %}

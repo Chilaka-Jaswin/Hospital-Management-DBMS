@@ -1,0 +1,16 @@
+CREATE DATABASE IF NOT EXISTS hospital_db; USE hospital_db;
+CREATE TABLE IF NOT EXISTS Department(department_id INT PRIMARY KEY AUTO_INCREMENT,department_name VARCHAR(100) NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS Doctor(doctor_id INT PRIMARY KEY AUTO_INCREMENT,doctor_name VARCHAR(100) NOT NULL,specialization VARCHAR(100),phone VARCHAR(15),department_id INT,FOREIGN KEY(department_id) REFERENCES Department(department_id));
+CREATE TABLE IF NOT EXISTS Patient(patient_id INT PRIMARY KEY AUTO_INCREMENT,patient_name VARCHAR(100) NOT NULL,gender VARCHAR(20),date_of_birth DATE,phone VARCHAR(15),address VARCHAR(200));
+CREATE TABLE IF NOT EXISTS Appointment(appointment_id INT PRIMARY KEY AUTO_INCREMENT,patient_id INT NOT NULL,doctor_id INT NOT NULL,appointment_date DATE NOT NULL,appointment_time TIME,status VARCHAR(30) DEFAULT 'Scheduled',FOREIGN KEY(patient_id) REFERENCES Patient(patient_id),FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id));
+CREATE TABLE IF NOT EXISTS Room(room_id INT PRIMARY KEY AUTO_INCREMENT,room_number VARCHAR(20) UNIQUE NOT NULL,room_type VARCHAR(50),daily_charge DECIMAL(10,2),status VARCHAR(30) DEFAULT 'Available');
+CREATE TABLE IF NOT EXISTS Admission(admission_id INT PRIMARY KEY AUTO_INCREMENT,patient_id INT NOT NULL,room_id INT,admission_date DATE NOT NULL,discharge_date DATE,FOREIGN KEY(patient_id) REFERENCES Patient(patient_id),FOREIGN KEY(room_id) REFERENCES Room(room_id));
+CREATE TABLE IF NOT EXISTS Treatment(treatment_id INT PRIMARY KEY AUTO_INCREMENT,patient_id INT NOT NULL,doctor_id INT NOT NULL,treatment_description VARCHAR(500),treatment_date DATE NOT NULL,FOREIGN KEY(patient_id) REFERENCES Patient(patient_id),FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id));
+CREATE TABLE IF NOT EXISTS Medicine(medicine_id INT PRIMARY KEY AUTO_INCREMENT,medicine_name VARCHAR(100) NOT NULL,category VARCHAR(100),price DECIMAL(10,2),stock_quantity INT DEFAULT 0);
+CREATE TABLE IF NOT EXISTS Billing(bill_id INT PRIMARY KEY AUTO_INCREMENT,patient_id INT NOT NULL,bill_date DATE NOT NULL,total_amount DECIMAL(10,2) NOT NULL,payment_status VARCHAR(30) DEFAULT 'Pending',FOREIGN KEY(patient_id) REFERENCES Patient(patient_id));
+CREATE TABLE IF NOT EXISTS Users(user_id INT PRIMARY KEY AUTO_INCREMENT,username VARCHAR(100) UNIQUE NOT NULL,password VARCHAR(255) NOT NULL,role VARCHAR(50));
+INSERT IGNORE INTO Department VALUES(1,'Cardiology'),(2,'Neurology'),(3,'Orthopedics'),(4,'Pediatrics'),(5,'General Medicine');
+INSERT IGNORE INTO Doctor VALUES(1,'Dr. Rajesh Kumar','Cardiologist','9876543210',1),(2,'Dr. Anitha Rao','Neurologist','9876543211',2),(3,'Dr. Priya Sharma','Orthopedic','9876543212',3);
+INSERT IGNORE INTO Patient VALUES(1,'Arjun Kumar','Male','2002-05-14','9000000001','Rajahmundry'),(2,'Sneha Reddy','Female','2003-08-20','9000000002','Kakinada'),(3,'Rahul Varma','Male','1999-11-10','9000000003','Surampalem');
+INSERT IGNORE INTO Medicine VALUES(1,'Paracetamol','Pain Relief',25,500),(2,'Amoxicillin','Antibiotic',80,200),(3,'Vitamin D','Supplement',120,150);
+INSERT IGNORE INTO Appointment VALUES(1,1,1,'2026-09-28','09:30:00','Scheduled'),(2,2,2,'2026-09-29','11:00:00','Completed');
