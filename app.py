@@ -26,15 +26,24 @@ app.secret_key = os.getenv(
 
 import os
 
+
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "medicore_hospital_dbms_2026"
+)
+
 DB = {
     "host": os.getenv("DB_HOST", "localhost"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "hospital_db"),
     "port": int(os.getenv("DB_PORT", "3306")),
-    "ssl_disabled": False
-}
 
+    # Aiven SSL
+    "ssl_ca": os.getenv("SSL_CA_PATH", "certs/ca.pem"),
+    "ssl_verify_cert": True,
+    "ssl_verify_identity": True
+}
 # =========================================================
 # DATABASE CONNECTION
 # =========================================================
